@@ -1,0 +1,51 @@
+// color
+// $primary-color: #009fff;
+// $primary-color-light: #d4f1f4;
+// $primary-color-dark: #003454; // dark blue
+$clr-neon-blue: #4d4dff;
+$clr-neon-magenta: #ea00ff;
+$clr-accent-lemon: #ffff4d; // neon blue complementary
+$clr-accent-green: #4dffa6; //neon magenta complementary
+$clr-accent-grey: #3e4756;
+
+html,
+body {
+	height: 100%;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	padding: 0;
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+		Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+	line-height: 1.5;
+	text-rendering: optimizeSpeed;
+	scroll-behavior: auto;
+	color: $clr-accent-lemon;
+	background-color: black;
+}
+
+main {
+	max-width: 1444px;
+	height: 200px;
+	margin: 0 auto;
+	padding: 0.5rem 1rem;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+ul,
+ol,
+li {
+	list-style: none;
+	padding-left: 0;
+}
