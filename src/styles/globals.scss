@@ -1,12 +1,9 @@
-// color
-// $primary-color: #009fff;
-// $primary-color-light: #d4f1f4;
-// $primary-color-dark: #003454; // dark blue
-$clr-neon-blue: #4d4dff;
-$clr-neon-magenta: #ea00ff;
-$clr-accent-lemon: #ffff4d; // neon blue complementary
-$clr-accent-green: #4dffa6; //neon magenta complementary
-$clr-accent-grey: #3e4756;
+@import './variables.scss';
+
+/* 
+	* Components
+  */
+@import '../components/form/form.scss';
 
 html,
 body {
@@ -29,7 +26,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	max-width: 1444px;
-	height: 100vh;
+	height: 100%;
 }
 
 /* 
@@ -40,7 +37,10 @@ body {
 	display: flex;
 	justify-content: space-between;
 	width: 100%;
-	border-bottom: 1px solid $clr-accent-grey;
+	background-color: black;
+	box-shadow: 0px 0px 1em 0px rgba(95, 104, 120, 0.55);
+	-webkit-box-shadow: 0px 0px 1em 0px rgba(95, 104, 120, 0.55);
+	-moz-box-shadow: 0px 0px 1em 0px rgba(95, 104, 120, 0.55);
 }
 .nav {
 	display: flex;
@@ -51,25 +51,46 @@ body {
 	padding: 1rem 0rem;
 }
 .nav-link {
-	padding: 1rem;
+	padding: 0.7rem;
+	transition: background-color 100ms;
+
 	&:hover {
-		background-color: $clr-accent-grey;
+		background-color: $clr-shades-grey;
 	}
 }
 
+.active-link {
+	background-color: $clr-accent-grey;
+}
+
 main {
-	display: grid;
-	place-content: center;
-	place-items: center;
 	height: 100%;
-	margin: auto;
+	margin-top: 4rem;
+	margin-inline: auto;
 	padding: 0.5rem 1rem;
+}
+
+.home-header {
+	text-align: center;
+
+	h2 {
+		margin-top: 0;
+	}
+	p {
+		font-size: 1.4rem;
+
+		code {
+			font-weight: bold;
+			font-size: 1.25rem;
+		}
+	}
 }
 
 footer {
 	padding: 1rem 0;
 	border-top: 1px solid $clr-accent-grey;
 	text-align: center;
+	background-color: black;
 }
 
 a {
