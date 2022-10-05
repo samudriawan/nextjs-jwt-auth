@@ -8,6 +8,7 @@ function FormState() {
 	});
 	const [inputError, setInputError] = useState([]);
 	const [canSubmit, setCanSubmit] = useState(false);
+	const [serverResponse, setServerResponse] = useState(null);
 
 	function onChangeHandler(e) {
 		const { name, value } = e.currentTarget;
@@ -48,18 +49,22 @@ function FormState() {
 		// const form = Object.fromEntries(new FormData(e.target));
 		// console.log(form);
 
-		const res = await fetch('http://localhost:3000/api/hello', {
+		const res = await fetch('http://localhost:3000/api/users/authenticate', {
 			method: 'POST',
 			body: JSON.stringify(formData),
 			headers: { 'Content-type': 'application/json' },
 		});
 		const authed = await res.json();
 
-		if (!authed.success) return setUser(null);
+		console.log(authed);
+		if (!authed.success) {
+			setUser(null);
+			setServerResponse(authed.msg);
+			return;
+		}
 
+		setServerResponse(null);
 		setUser(formData);
-
-		// console.log(authed);
 	}
 
 	return (
@@ -92,8 +97,17 @@ function FormState() {
 				<button className="btn " disabled={!canSubmit}>
 					Login
 				</button>
+				<div style={{ textAlign: 'center' }}>
+					{serverResponse != null ? serverResponse : ''}
+				</div>
 			</form>
-			{/* {user != null ? <div>{JSON.stringify(user, null, 2)}</div> : ''} */}
+			{user != null ? (
+				<div style={{ textAlign: 'center' }}>
+					{JSON.stringify(user, null, 2)}
+				</div>
+			) : (
+				''
+			)}
 		</>
 	);
 }
