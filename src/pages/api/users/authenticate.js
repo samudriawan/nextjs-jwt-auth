@@ -1,5 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import cookie from 'cookie';
 
 const LOCAL_DATA = [
 	{
@@ -21,7 +23,6 @@ const LOCAL_DATA = [
 export default async function handler(req, res) {
 	const { email, password } = req.body;
 	const { method } = req;
-	let passwordValid = false;
 
 	// only accept POST method
 	if (method !== 'POST')
@@ -33,15 +34,34 @@ export default async function handler(req, res) {
 		return res.status(400).json({ success: false, msg: 'User did not exist' });
 
 	// compare password from client with hash data
-	await bcrypt
-		.compare(password, user.hash)
-		.then((res) => (passwordValid = res))
-		.catch((err) => res.status(500).json(err));
+	const passwordValid = await bcrypt.compare(password, user.hash);
 
 	if (!passwordValid)
 		return res
 			.status(400)
 			.json({ success: false, msg: 'Password is not correct.' });
 
-	return res.status(200).json({ success: true, user });
+	const accessToken = jwt.sign(
+		{ email: user.email },
+		process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY,
+		{ expiresIn: '1m' }
+	);
+
+	const refreshToken = jwt.sign(
+		{ email: user.email },
+		process.env.NEXT_PUBLIC_REFRESH_TOKEN_KEY,
+		{ expiresIn: '7d' }
+	);
+
+	res.setHeader(
+		'Set-Cookie',
+		cookie.serialize('jwt', refreshToken, {
+			httpOnly: true, // accessible only by web server
+			// secure: true, // https
+			sameSite: 'None', // cross-site cookie
+			maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expire, set to match refresh token
+		})
+	);
+
+	return res.json({ success: true, accessToken });
 }
