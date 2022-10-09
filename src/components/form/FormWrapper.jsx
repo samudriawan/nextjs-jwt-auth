@@ -53,18 +53,21 @@ function FormState() {
 			method: 'POST',
 			body: JSON.stringify(formData),
 			headers: { 'Content-type': 'application/json' },
+			credentials: 'include',
 		});
 		const authed = await res.json();
 
-		console.log(authed);
+		// console.log(authed);
 		if (!authed.success) {
 			setUser(null);
 			setServerResponse(authed.msg);
 			return;
 		}
 
+		localStorage.setItem('token', authed.accessToken);
 		setServerResponse(null);
-		setUser(formData);
+		setUser({ ...formData, ...authed });
+		// console.log(authed);
 	}
 
 	return (
@@ -102,7 +105,7 @@ function FormState() {
 				</div>
 			</form>
 			{user != null ? (
-				<div style={{ textAlign: 'center' }}>
+				<div style={{ width: 900, textAlign: 'center' }}>
 					{JSON.stringify(user, null, 2)}
 				</div>
 			) : (
