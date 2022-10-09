@@ -11,17 +11,14 @@ export default function Home() {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 
-			<main>
-				<header className="home-header">
-					<h2>JWT Authorization</h2>
-					<p>
-						Use: <code>example@example.com</code> or{' '}
-						<code>example2@example.com</code> and password:{' '}
-						<code>password</code>
-					</p>
-				</header>
-				<FormWrapper />
-			</main>
+			<header className="home-header">
+				<h2>JWT Authorization</h2>
+				<p>
+					Use: <code>example@example.com</code> or{' '}
+					<code>example2@example.com</code> and password: <code>password</code>
+				</p>
+			</header>
+			<FormWrapper />
 		</>
 	);
 }
