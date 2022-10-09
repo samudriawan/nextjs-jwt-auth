@@ -6,7 +6,9 @@
 @import '../components/form/form.scss';
 
 html,
-body {
+body,
+main,
+#__next {
 	height: 100%;
 }
 
@@ -22,18 +24,18 @@ body {
 	background-color: black;
 }
 
-.app-container {
+#__next {
 	display: flex;
 	flex-direction: column;
 	max-width: 1444px;
-	height: 100%;
 }
 
 /* 
 	* navigation
  */
 .navbar {
-	position: fixed;
+	position: sticky;
+	top: 0;
 	display: flex;
 	justify-content: space-between;
 	width: 100%;
@@ -64,9 +66,6 @@ body {
 }
 
 main {
-	height: 100%;
-	margin-top: 4rem;
-	margin-inline: auto;
 	padding: 0.5rem 1rem;
 }
 
