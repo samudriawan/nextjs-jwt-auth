@@ -8,20 +8,20 @@ function MyApp({ Component, pageProps }) {
 			<Head>
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 			</Head>
-			<div className="app-container">
-				<Navbar />
+			<Navbar />
+			<main>
 				<Component {...pageProps} />
-				<footer>
-					2022{' '}
-					<a
-						href="http://github.com/samudriawan"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						samudriawan
-					</a>
-				</footer>
-			</div>
+			</main>
+			<footer>
+				2022{' '}
+				<a
+					href="http://github.com/samudriawan"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					samudriawan
+				</a>
+			</footer>
 		</>
 	);
 }
