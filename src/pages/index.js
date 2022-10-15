@@ -1,7 +1,9 @@
 import Head from 'next/head';
-import FormWrapper from '../components/form/FormWrapper';
+import Link from 'next/link';
 
-export default function Home() {
+export default function Home(props) {
+	const { user } = props;
+
 	return (
 		<>
 			<Head>
@@ -12,13 +14,9 @@ export default function Home() {
 			</Head>
 
 			<header className="home-header">
-				<h2>JWT Authorization</h2>
-				<p>
-					Use: <code>example@example.com</code> or{' '}
-					<code>example2@example.com</code> and password: <code>password</code>
-				</p>
+				<h1>Hi, {user?.email}!</h1>
+				<p>You&apos;re logged in with Next.js & JWT!!</p>
 			</header>
-			<FormWrapper />
 		</>
 	);
 }
