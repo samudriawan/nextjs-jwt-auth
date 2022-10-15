@@ -1,7 +1,7 @@
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 function FormState() {
-	const [user, setUser] = useState(null);
 	const [formData, setFormData] = useState({
 		email: '',
 		password: '',
@@ -9,6 +9,7 @@ function FormState() {
 	const [inputError, setInputError] = useState([]);
 	const [canSubmit, setCanSubmit] = useState(false);
 	const [serverResponse, setServerResponse] = useState(null);
+	const router = useRouter();
 
 	function onChangeHandler(e) {
 		const { name, value } = e.currentTarget;
@@ -46,9 +47,6 @@ function FormState() {
 	async function onSubmitHandler(e) {
 		e.preventDefault();
 
-		// const form = Object.fromEntries(new FormData(e.target));
-		// console.log(form);
-
 		const res = await fetch('http://localhost:3000/api/users/authenticate', {
 			method: 'POST',
 			body: JSON.stringify(formData),
@@ -57,17 +55,15 @@ function FormState() {
 		});
 		const authed = await res.json();
 
-		// console.log(authed);
 		if (!authed.success) {
 			setUser(null);
 			setServerResponse(authed.msg);
 			return;
 		}
 
-		localStorage.setItem('token', authed.accessToken);
+		localStorage.setItem('user', JSON.stringify(authed.user));
 		setServerResponse(null);
-		setUser({ ...formData, ...authed });
-		// console.log(authed);
+		router.push('/');
 	}
 
 	return (
@@ -100,17 +96,10 @@ function FormState() {
 				<button className="btn " disabled={!canSubmit}>
 					Login
 				</button>
-				<div style={{ textAlign: 'center' }}>
+				<div style={{ textAlign: 'center', marginTop: '1rem' }}>
 					{serverResponse != null ? serverResponse : ''}
 				</div>
 			</form>
-			{user != null ? (
-				<div style={{ width: 900, textAlign: 'center' }}>
-					{JSON.stringify(user, null, 2)}
-				</div>
-			) : (
-				''
-			)}
 		</>
 	);
 }
