@@ -44,7 +44,8 @@ export default async function handler(req, res) {
 	const accessToken = jwt.sign(
 		{ email: user.email },
 		process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY,
-		{ expiresIn: '1m' }
+		// TODO: change expiresIn when before deploy the app
+		{ expiresIn: 60 }
 	);
 
 	const refreshToken = jwt.sign(
@@ -57,11 +58,11 @@ export default async function handler(req, res) {
 		'Set-Cookie',
 		cookie.serialize('jwt', refreshToken, {
 			httpOnly: true, // accessible only by web server
-			// secure: true, // https
+			secure: true, // https
 			sameSite: 'None', // cross-site cookie
 			maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expire, set to match refresh token
 		})
 	);
 
-	return res.json({ success: true, accessToken });
+	return res.json({ success: true, user: { email: user.email, accessToken } });
 }
