@@ -30,8 +30,11 @@ function MyApp({ Component, pageProps }) {
 		const publicPaths = ['/login'];
 
 		if (!userValue && !publicPaths.includes(url)) {
-			setAuthorized(false);
 			router.push('/login');
+			setAuthorized(false);
+		} else if (userValue && publicPaths.includes(url)) {
+			router.push('/');
+			setAuthorized(false);
 		} else {
 			setAuthorized(true);
 		}
@@ -47,7 +50,7 @@ function MyApp({ Component, pageProps }) {
 				{authorized ? (
 					<Component {...pageProps} user={user} />
 				) : (
-					<p>Please wait...</p>
+					<p style={{ textAlign: 'center' }}>Please wait...</p>
 				)}
 			</main>
 			<footer>
