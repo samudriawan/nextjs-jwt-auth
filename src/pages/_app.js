@@ -1,8 +1,42 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import '../styles/globals.scss';
 
 function MyApp({ Component, pageProps }) {
+	const [user, setUser] = useState(null);
+	const [authorized, setAuthorized] = useState(false);
+
+	const router = useRouter();
+
+	useEffect(() => {
+		authCheck(router.asPath);
+
+		const hideContent = () => setAuthorized(false);
+		router.events.on('routeChangeStart', hideContent);
+
+		router.events.on('routeChangeComplete', authCheck);
+
+		return () => {
+			router.events.off('routeChangeStart', hideContent);
+			router.events.off('routeChangeComplete', authCheck);
+		};
+	}, []);
+
+	function authCheck(url) {
+		const userValue = JSON.parse(localStorage.getItem('user'));
+		setUser(userValue);
+		const publicPaths = ['/login'];
+
+		if (!userValue && !publicPaths.includes(url)) {
+			setAuthorized(false);
+			router.push('/login');
+		} else {
+			setAuthorized(true);
+		}
+	}
+
 	return (
 		<>
 			<Head>
@@ -10,7 +44,11 @@ function MyApp({ Component, pageProps }) {
 			</Head>
 			<Navbar />
 			<main>
-				<Component {...pageProps} />
+				{authorized ? (
+					<Component {...pageProps} user={user} />
+				) : (
+					<p>Please wait...</p>
+				)}
 			</main>
 			<footer>
 				2022{' '}
