@@ -56,7 +56,6 @@ function FormState() {
 		const authed = await res.json();
 
 		if (!authed.success) {
-			setUser(null);
 			setServerResponse(authed.msg);
 			return;
 		}
