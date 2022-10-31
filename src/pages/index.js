@@ -1,8 +1,9 @@
 import Head from 'next/head';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 export default function Home(props) {
 	const { user } = props;
+	const router = useRouter();
 
 	return (
 		<>
@@ -17,6 +18,18 @@ export default function Home(props) {
 				<h1>Hi, {user?.email}!</h1>
 				<p>You&apos;re logged in with Next.js & JWT!!</p>
 			</header>
+
+			<div className="home-content">
+				<button
+					onClick={() => {
+						localStorage.removeItem('user');
+						router.push('/');
+					}}
+					className="btn-logout"
+				>
+					Sign out
+				</button>
+			</div>
 		</>
 	);
 }

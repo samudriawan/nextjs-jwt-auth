@@ -84,6 +84,27 @@ main {
 	}
 }
 
+.home-content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	.btn-logout {
+		padding: 0.5em 1em;
+		margin: 0.7em 0;
+		font-size: 1.01rem;
+		border: none;
+		border-radius: 0.3em;
+		background-color: $clr-neon-magenta;
+		cursor: pointer;
+		transition: background-color 100ms ease-in-out;
+
+		&:hover {
+			background-color: $clr-shades-neon-magenta;
+		}
+	}
+}
+
 footer {
 	margin-top: auto;
 	padding: 1rem 0;
