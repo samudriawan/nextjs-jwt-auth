@@ -7,7 +7,6 @@
 
 html,
 body,
-main,
 #__next {
 	height: 100%;
 }
@@ -86,6 +85,7 @@ main {
 }
 
 footer {
+	margin-top: auto;
 	padding: 1rem 0;
 	border-top: 1px solid $clr-accent-grey;
 	text-align: center;
