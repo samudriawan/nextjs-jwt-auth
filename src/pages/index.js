@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 export default function Home(props) {
@@ -20,6 +21,9 @@ export default function Home(props) {
 			</header>
 
 			<div className="home-content">
+				<Link href={'/users'}>
+					<a>Manage Users</a>
+				</Link>
 				<button
 					onClick={() => {
 						localStorage.removeItem('user');

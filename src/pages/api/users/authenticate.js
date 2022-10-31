@@ -64,5 +64,13 @@ export default async function handler(req, res) {
 		})
 	);
 
-	return res.json({ success: true, user: { email: user.email, accessToken } });
+	return res.json({
+		success: true,
+		user: {
+			email: user.email,
+			id: user.id,
+			dateCreated: user.dateCreated,
+			accessToken,
+		},
+	});
 }
