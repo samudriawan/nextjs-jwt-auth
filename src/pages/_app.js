@@ -13,7 +13,7 @@ function MyApp({ Component, pageProps }) {
 
 	useEffect(() => {
 		authCheck(router.asPath);
-		setAuth(JSON.parse(localStorage.getItem('user')));
+		setAuth(JSON.parse(localStorage.getItem('user')).user);
 
 		router.events.on('routeChangeComplete', authCheck);
 

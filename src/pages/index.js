@@ -1,10 +1,11 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useAuthContext } from '../context/authContext';
 
-export default function Home(props) {
-	const { user } = props;
+export default function Home() {
 	const router = useRouter();
+	const { auth } = useAuthContext();
 
 	return (
 		<>
@@ -16,7 +17,7 @@ export default function Home(props) {
 			</Head>
 
 			<header className="home-header">
-				<h1>Hi, {user?.email}!</h1>
+				<h1>Hi, {auth?.email}!</h1>
 				<p>You&apos;re logged in with Next.js & JWT!!</p>
 			</header>
 
@@ -27,7 +28,7 @@ export default function Home(props) {
 				<button
 					onClick={() => {
 						localStorage.removeItem('user');
-						router.push('/');
+						router.push('/login');
 					}}
 					className="btn-logout"
 				>
