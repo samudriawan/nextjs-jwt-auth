@@ -2,31 +2,29 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
+import { authContext } from '../context/authContext';
 import '../styles/globals.scss';
 
 function MyApp({ Component, pageProps }) {
-	const [user, setUser] = useState(null);
 	const [authorized, setAuthorized] = useState(false);
+	const [auth, setAuth] = useState(null);
 
 	const router = useRouter();
 
 	useEffect(() => {
 		authCheck(router.asPath);
-
-		const hideContent = () => setAuthorized(false);
-		router.events.on('routeChangeStart', hideContent);
+		setAuth(JSON.parse(localStorage.getItem('user')));
 
 		router.events.on('routeChangeComplete', authCheck);
 
 		return () => {
-			router.events.off('routeChangeStart', hideContent);
 			router.events.off('routeChangeComplete', authCheck);
 		};
 	}, []);
 
+	console.log(auth);
 	function authCheck(url) {
 		const userValue = JSON.parse(localStorage.getItem('user'));
-		setUser(userValue);
 		const publicPaths = ['/login'];
 
 		if (!userValue && !publicPaths.includes(url)) {
@@ -47,10 +45,10 @@ function MyApp({ Component, pageProps }) {
 			</Head>
 			<Navbar />
 			<main>
-				{authorized ? (
-					<Component {...pageProps} user={user} />
-				) : (
-					<p style={{ textAlign: 'center' }}>Please wait...</p>
+				{authorized && (
+					<authContext.Provider value={{ auth, setAuth }}>
+						<Component {...pageProps} />
+					</authContext.Provider>
 				)}
 			</main>
 			<footer>
