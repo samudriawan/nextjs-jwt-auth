@@ -1,0 +1,16 @@
+[
+	{
+		"email": "example@example.com",
+		"hash": "$2a$10$Z8qEQjShwKxM72UPrgReIOdLIZslhIDxcU0KQkjmCzSsrcxZ9PSd2",
+		"dateCreated": "10/2/2022, 5:06:23 PM",
+		"dateModified": "10/2/2022, 5:06:24 PM",
+		"id": 1
+	},
+	{
+		"email": "example2@example.com",
+		"hash": "$2a$10$Z8qEQjShwKxM72UPrgReIOdLIZslhIDxcU0KQkjmCzSsrcxZ9PSd2",
+		"dateCreated": "10/2/2022, 5:06:23 PM",
+		"dateModified": "10/2/2022, 5:06:24 PM",
+		"id": 2
+	}
+]
