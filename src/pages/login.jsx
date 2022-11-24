@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import FormWrapper from '../components/form/FormWrapper';
+import LoginForm from '../components/form/Login';
 
 function Login() {
 	return (
@@ -18,7 +18,7 @@ function Login() {
 					<code>example2@example.com</code> and password: <code>password</code>
 				</p>
 			</header>
-			<FormWrapper />
+			<LoginForm />
 		</>
 	);
 }

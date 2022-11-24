@@ -1,7 +1,8 @@
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useAuthContext } from '../../context/authContext';
 
-function FormState() {
+function LoginForm() {
 	const [formData, setFormData] = useState({
 		email: '',
 		password: '',
@@ -9,7 +10,13 @@ function FormState() {
 	const [inputError, setInputError] = useState([]);
 	const [canSubmit, setCanSubmit] = useState(false);
 	const [serverResponse, setServerResponse] = useState(null);
+	const { setAuth } = useAuthContext();
 	const router = useRouter();
+	const emailRef = useRef();
+
+	useEffect(() => {
+		emailRef.current.focus();
+	}, []);
 
 	function onChangeHandler(e) {
 		const { name, value } = e.currentTarget;
@@ -50,19 +57,27 @@ function FormState() {
 		const res = await fetch('http://localhost:3000/api/users/authenticate', {
 			method: 'POST',
 			body: JSON.stringify(formData),
-			headers: { 'Content-type': 'application/json' },
+			headers: {
+				'Content-type': 'application/json',
+			},
 			credentials: 'include',
 		});
-		const authed = await res.json();
+		const data = await res.json();
+		// {success: true, email: user.email,	token: accessToken }
 
-		if (!authed.success) {
-			setServerResponse(authed.msg);
+		if (!data.success) {
+			setServerResponse(data.msg);
 			return;
 		}
 
-		localStorage.setItem('user', JSON.stringify(authed.user));
+		localStorage.setItem('user', JSON.stringify(data));
 		setServerResponse(null);
-		router.push('/');
+		setAuth(data);
+		setFormData({
+			email: '',
+			password: '',
+		});
+		router.back();
 	}
 
 	return (
@@ -75,6 +90,7 @@ function FormState() {
 						type="text"
 						name="email"
 						id="email"
+						ref={emailRef}
 						value={formData.email}
 						onChange={onChangeHandler}
 						placeholder="Email"
@@ -102,4 +118,4 @@ function FormState() {
 		</>
 	);
 }
-export default FormState;
+export default LoginForm;
