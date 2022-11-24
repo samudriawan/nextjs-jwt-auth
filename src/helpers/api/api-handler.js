@@ -10,10 +10,11 @@ export function apiHandler(handler) {
 
 		try {
 			const authHeaders = req.headers['authorization'] || null;
-			const bearerAuth = authHeaders.startsWith('Bearer ');
-			if (!bearerAuth) return res.status(401);
 
-			const accessToken = bearerAuth.split(' ')[1];
+			if (!authHeaders && !authHeaders.startsWith('Bearer '))
+				return res.status(401);
+
+			const accessToken = authHeaders.split(' ')[1];
 
 			// verify access token
 			const decoded = jwt.verify(
