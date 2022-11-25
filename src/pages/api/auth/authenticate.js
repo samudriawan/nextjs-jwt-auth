@@ -12,9 +12,10 @@ export default async function handler(req, res) {
 	if (method !== 'POST')
 		return res.status(500).json('Method is not supported.');
 
-	// const user = LOCAL_DATA.find((x) => x.email === email);
+	// get user data
 	const user = users.find((x) => x.email === email);
 
+	// user not found
 	if (!user)
 		return res.status(400).json({ success: false, msg: 'User did not exist' });
 
@@ -29,24 +30,22 @@ export default async function handler(req, res) {
 	const accessToken = jwt.sign(
 		{ email: user.email },
 		process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY,
-		// TODO: change expiresIn when before deploy the app
-		{ expiresIn: 60 }
+		{ expiresIn: '1h' }
 	);
 
 	const refreshToken = jwt.sign(
 		{ email: user.email },
 		process.env.NEXT_PUBLIC_REFRESH_TOKEN_KEY,
-		{ expiresIn: '1h' }
+		{ expiresIn: '7d' }
 	);
 
 	res.setHeader(
 		'Set-Cookie',
 		cookie.serialize('jwt', refreshToken, {
 			httpOnly: true, // accessible only by web server
-			// secure: true, // https
-			// sameSite: 'None', // cross-site cookie
-			maxAge: 60 * 60 * 1000, // cookie expire, set to match refresh token
-			// maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expire, set to match refresh token
+			secure: true, // https
+			sameSite: 'none', // cross-site cookie
+			maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expire, set to match refresh token
 			path: '/',
 		})
 	);

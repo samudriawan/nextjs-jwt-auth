@@ -54,7 +54,7 @@ function LoginForm() {
 	async function onSubmitHandler(e) {
 		e.preventDefault();
 
-		const res = await fetch('http://localhost:3000/api/users/authenticate', {
+		const res = await fetch('http://localhost:3000/api/auth/authenticate', {
 			method: 'POST',
 			body: JSON.stringify(formData),
 			headers: {
