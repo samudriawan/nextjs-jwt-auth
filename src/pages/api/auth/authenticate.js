@@ -2,7 +2,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import cookie from 'cookie';
-import users from '../../../data/db.json';
+import User from '../../../model/User';
+import connectDB from '../../../helpers/dbConn';
 
 export default async function handler(req, res) {
 	const { email, password } = req.body;
@@ -12,15 +13,18 @@ export default async function handler(req, res) {
 	if (method !== 'POST')
 		return res.status(500).json('Method is not supported.');
 
+	// connect to mongoDB
+	connectDB();
+
 	// get user data
-	const user = users.find((x) => x.email === email);
+	const foundUser = await User.findOne({ email: email });
 
 	// user not found
-	if (!user)
-		return res.status(400).json({ success: false, msg: 'User did not exist' });
+	if (!foundUser)
+		return res.status(400).json({ success: false, msg: 'Email did not exist' });
 
 	// compare password from client with hash data
-	const passwordValid = await bcrypt.compare(password, user.hash);
+	const passwordValid = await bcrypt.compare(password, foundUser.hash);
 
 	if (!passwordValid)
 		return res
@@ -28,16 +32,24 @@ export default async function handler(req, res) {
 			.json({ success: false, msg: 'Password is not correct.' });
 
 	const accessToken = jwt.sign(
-		{ email: user.email },
+		{ email: foundUser.email },
 		process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY,
 		{ expiresIn: '1h' }
 	);
 
 	const refreshToken = jwt.sign(
-		{ email: user.email },
+		{ email: foundUser.email },
 		process.env.NEXT_PUBLIC_REFRESH_TOKEN_KEY,
 		{ expiresIn: '7d' }
 	);
+
+	// get refresh token from DB
+	const refreshTokenArray = foundUser.refresh_token;
+
+	// add newly created refresh token to DB
+	refreshTokenArray.push(refreshToken);
+	foundUser.refresh_token = refreshTokenArray;
+	foundUser.save();
 
 	res.setHeader(
 		'Set-Cookie',
@@ -52,7 +64,7 @@ export default async function handler(req, res) {
 
 	return res.json({
 		success: true,
-		email: user.email,
+		email: foundUser.email,
 		token: accessToken,
 	});
 }
