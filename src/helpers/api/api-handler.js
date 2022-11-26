@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import connectDB from '../dbConn';
 
 export function apiHandler(handler) {
 	return async (req, res) => {
@@ -22,6 +23,9 @@ export function apiHandler(handler) {
 				process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY
 			);
 			req.email = decoded.email;
+
+			// connect to mongoDB
+			connectDB();
 
 			// route handler
 			await handler[method](req, res);
