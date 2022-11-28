@@ -5,7 +5,21 @@ import { useAuthContext } from '../context/authContext';
 
 export default function Home() {
 	const router = useRouter();
-	const { auth } = useAuthContext();
+	const { auth, setAuth } = useAuthContext();
+
+	async function handleLogout() {
+		const resp = await fetch('http://localhost:3000/api/auth/logout', {
+			method: 'POST',
+			credentials: 'include',
+		});
+		console.log(resp);
+		if (resp.status === 204) {
+			// delete localStorage and access token
+			setAuth({ ...auth, token: '' });
+			localStorage.removeItem('user');
+			router.push('/login');
+		}
+	}
 
 	return (
 		<>
@@ -25,13 +39,7 @@ export default function Home() {
 				<Link href={'/users'}>
 					<a>Manage Users</a>
 				</Link>
-				<button
-					onClick={() => {
-						localStorage.removeItem('user');
-						router.push('/login');
-					}}
-					className="btn-logout"
-				>
+				<button onClick={handleLogout} className="btn-logout">
 					Sign out
 				</button>
 			</div>
