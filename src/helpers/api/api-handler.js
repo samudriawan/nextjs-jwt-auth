@@ -4,25 +4,34 @@ import connectDB from '../dbConn';
 export function apiHandler(handler) {
 	return async (req, res) => {
 		const method = req.method.toLowerCase();
-		// console.log(req.headers['authorization']);
 
 		// check handler supports HTTP method
 		if (!handler[method]) return res.status(405);
 
+		const publicPaths = [
+			'/api/auth/authenticate',
+			'/api/auth/refresh',
+			'/api/auth/logout',
+		];
+
 		try {
-			const authHeaders = req.headers['authorization'] || null;
+			// if endpoint not includes in publicPaths
+			// skip Authorization Bearer checking
+			if (!publicPaths.includes(req.url)) {
+				const authHeaders = req.headers['authorization'] || null;
 
-			if (!authHeaders && !authHeaders.startsWith('Bearer '))
-				return res.status(401);
+				if (!authHeaders && !authHeaders.startsWith('Bearer '))
+					return res.status(401);
 
-			const accessToken = authHeaders.split(' ')[1];
+				const accessToken = authHeaders.split(' ')[1];
 
-			// verify access token
-			const decoded = jwt.verify(
-				accessToken,
-				process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY
-			);
-			req.email = decoded.email;
+				// verify access token
+				const decoded = jwt.verify(
+					accessToken,
+					process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY
+				);
+				req.email = decoded.email;
+			}
 
 			// connect to mongoDB
 			connectDB();
