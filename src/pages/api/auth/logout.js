@@ -23,19 +23,6 @@ async function logout(req, res) {
 			(rt) => rt !== refreshToken
 		);
 		await foundUser.save();
-		console.log('breakpoint');
-		// delete cookies
-		// res.setHeader(
-		// 	'Set-Cookie',
-		// 	cookie.serialize('jwt', 'deleted', {
-		// 		httpOnly: true, // accessible only by web server
-		// 		secure: true, // https
-		// 		sameSite: 'none', // cross-site cookie
-		// 		maxAge: 0, // cookie expire, set to match refresh token
-		// 		path: '/',
-		// 		expires: Date.now(),
-		// 	})
-		// );
 	}
 
 	// delete cookies
