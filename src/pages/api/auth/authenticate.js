@@ -3,21 +3,22 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import cookie from 'cookie';
 import User from '../../../model/User';
-import connectDB from '../../../helpers/dbConn';
+import { apiHandler } from '../../../helpers/api/api-handler';
 
-export default async function handler(req, res) {
+export default apiHandler({
+	post: login,
+});
+
+async function login(req, res) {
 	const { email, password } = req.body;
-	const { method } = req;
+	const { method, cookies } = req;
 
 	// only accept POST method
 	if (method !== 'POST')
 		return res.status(500).json('Method is not supported.');
 
-	// connect to mongoDB
-	connectDB();
-
 	// get user data
-	const foundUser = await User.findOne({ email: email });
+	const foundUser = await User.findOne({ email: email }).exec();
 
 	// user not found
 	if (!foundUser)
@@ -28,15 +29,15 @@ export default async function handler(req, res) {
 
 	if (!passwordValid)
 		return res
-			.status(400)
+			.status(401)
 			.json({ success: false, msg: 'Password is not correct.' });
 
+	// create JWTs
 	const accessToken = jwt.sign(
 		{ email: foundUser.email },
 		process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY,
 		{ expiresIn: '1h' }
 	);
-
 	const refreshToken = jwt.sign(
 		{ email: foundUser.email },
 		process.env.NEXT_PUBLIC_REFRESH_TOKEN_KEY,
@@ -44,13 +45,15 @@ export default async function handler(req, res) {
 	);
 
 	// get refresh token from DB
-	const refreshTokenArray = foundUser.refresh_token;
+	let refreshTokenArray = cookies['jwt']
+		? foundUser.refresh_token.filter((rt) => rt !== cookies['jwt'])
+		: foundUser.refresh_token;
 
 	// add newly created refresh token to DB
-	refreshTokenArray.push(refreshToken);
-	foundUser.refresh_token = refreshTokenArray;
-	foundUser.save();
+	foundUser.refresh_token = [...refreshTokenArray, refreshToken];
+	await foundUser.save();
 
+	// create httpOnly secure cookies with refresh token
 	res.setHeader(
 		'Set-Cookie',
 		cookie.serialize('jwt', refreshToken, {
@@ -62,7 +65,8 @@ export default async function handler(req, res) {
 		})
 	);
 
-	return res.json({
+	// send user email and access token to user
+	res.json({
 		success: true,
 		email: foundUser.email,
 		token: accessToken,
