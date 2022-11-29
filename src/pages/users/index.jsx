@@ -11,7 +11,7 @@ function UsersPage() {
 
 	useEffect(() => {
 		handleFetchRetry('http://localhost:3000/api/users');
-	}, [auth]);
+	}, []);
 
 	async function handleFetchRetry(url, token = auth ? auth.token : '') {
 		try {
@@ -20,7 +20,9 @@ function UsersPage() {
 				method: 'GET',
 				headers: { Authorization: `Bearer ${token}` },
 			});
-			// console.log('resp: ', resp.status);
+
+			// throw default status 500 error
+			if (resp.status === 500) throw 'Internal Server Error';
 
 			// if access token payload not match with database
 			if (resp.status === 401) throw 'credentials not match';
@@ -32,37 +34,42 @@ function UsersPage() {
 					credentials: 'include',
 				});
 
+				// throw default status 500 error
+				if (refresh.status === 500) throw 'Internal Server Error';
+
 				// refresh token expired
-				if (refresh.status === 403) throw 'refresh token invalid';
+				if (refresh.status === 403) throw 'RefreshTokenExpired';
 
 				// get new access token and store in localStorage and auth context
-				const json = await refresh.json();
-				const newToken = json.newAccessToken;
+				const data = await refresh.json();
+				const newToken = data.newAccessToken || '';
 				localStorage.setItem(
 					'user',
 					JSON.stringify({ ...auth, token: newToken })
 				);
-				// setUser({ token: newToken });
 				setAuth({ ...auth, token: newToken });
-				// console.log('refresh: ', user);
 
 				// call the function again
 				return await handleFetchRetry(url, newToken);
 			}
 
 			// status 200 OK
-			// get the data
 			const data = await resp.json();
 			setUser(data);
 			setIsLoading(false);
-
-			// console.log('resp2: ', data);
 		} catch (err) {
-			// console.log('error catch: ', err);
-
 			// signin out
-			localStorage.removeItem('user');
-			router.push('/login');
+			const resp = await fetch('http://localhost:3000/api/auth/logout', {
+				method: 'POST',
+				credentials: 'include',
+			});
+			console.log(resp);
+			if (resp.status === 204) {
+				// delete localStorage and access token
+				setAuth({ ...auth, token: '' });
+				localStorage.removeItem('user');
+				router.push('/login');
+			}
 		}
 	}
 
@@ -94,7 +101,7 @@ function UsersPage() {
 							<tbody>
 								<tr>
 									<th>ID</th>
-									<td>{user?.id}</td>
+									<td>{user?._id}</td>
 								</tr>
 								<tr>
 									<th>Email</th>
@@ -102,7 +109,7 @@ function UsersPage() {
 								</tr>
 								<tr>
 									<th>Date Created</th>
-									<td>{user?.dateCreated}</td>
+									<td>{new Date(user?.createdAt).toLocaleString()}</td>
 								</tr>
 							</tbody>
 						</table>
