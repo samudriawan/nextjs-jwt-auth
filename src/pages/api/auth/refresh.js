@@ -1,11 +1,17 @@
 import jwt from 'jsonwebtoken';
 import cookie from 'cookie';
+import { apiHandler } from '../../../helpers/api/api-handler';
 
-export default async function refresh(req, res) {
+export default apiHandler({
+	post: refresh,
+});
+
+async function refresh(req, res) {
 	const { method, cookies } = req;
+	// console.log('refresh: ', cookies);
 
 	if (method === 'POST') {
-		const refreshToken = req.body.token || cookies['jwt'] || null;
+		const refreshToken = cookies['jwt'] || null;
 		if (!refreshToken) return res.status(401).send('token not found');
 
 		let payload = null;
