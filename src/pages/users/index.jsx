@@ -63,7 +63,6 @@ function UsersPage() {
 				method: 'POST',
 				credentials: 'include',
 			});
-			console.log(resp);
 			if (resp.status === 204) {
 				// delete localStorage and access token
 				setAuth({ ...auth, token: '' });

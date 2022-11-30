@@ -13,6 +13,7 @@ async function getUser(req, res) {
 	const foundUser = await User.findOne({ email: email }).select(
 		'_id email createdAt updatedAt'
 	);
+	// console.log(foundUser);
 
 	// if email from token not match with in the database
 	if (!foundUser) return res.status(401).send('credentials not match');
