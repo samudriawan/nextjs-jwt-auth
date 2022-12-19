@@ -24,14 +24,12 @@ function MyApp({ Component, pageProps }) {
 
 	function authCheck(url) {
 		const userValue = JSON.parse(localStorage.getItem('user'));
-		const publicPaths = ['/login'];
+		const publicPaths = ['/login', '/register'];
 
-		if (!userValue && !publicPaths.includes(url)) {
-			router.push('/login');
+		if (userValue && publicPaths.includes(url)) {
+			// logged in and public routes
 			setAuthorized(false);
-		} else if (userValue && publicPaths.includes(url)) {
 			router.push('/');
-			setAuthorized(false);
 		} else {
 			setAuthorized(true);
 		}

@@ -12,6 +12,7 @@ export function apiHandler(handler) {
 			'/api/auth/authenticate',
 			'/api/auth/refresh',
 			'/api/auth/logout',
+			'/api/auth/register',
 		];
 
 		try {

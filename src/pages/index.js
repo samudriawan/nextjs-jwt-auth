@@ -14,9 +14,9 @@ export default function Home() {
 		});
 		if (resp.status === 204) {
 			// delete localStorage and access token
-			setAuth({ ...auth, token: '' });
+			setAuth(null);
 			localStorage.removeItem('user');
-			router.push('/login');
+			router.push('/');
 		}
 	}
 
@@ -29,19 +29,47 @@ export default function Home() {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 
-			<header className="home-header">
-				<h1>Hi, {auth?.email}!</h1>
-				<p>You&apos;re logged in with Next.js & JWT!!</p>
-			</header>
+			{auth ? (
+				<>
+					{/* logged in view */}
+					<header className="home-header">
+						<h1>Hi, {auth?.email}!</h1>
+						<p>You&apos;re logged in with Next.js & JWT!!</p>
+					</header>
 
-			<div className="home-content">
-				<Link href={'/users'}>
-					<a>Manage Users</a>
-				</Link>
-				<button onClick={handleLogout} className="btn-logout">
-					Sign out
-				</button>
-			</div>
+					<div className="home-content">
+						<Link href={'/users'}>
+							<a className="link private-link">Manage Users</a>
+						</Link>
+						<button onClick={handleLogout} className="btn-logout">
+							Sign out
+						</button>
+					</div>
+				</>
+			) : (
+				<>
+					{/* not logged in view */}
+					<header className="home-header">
+						<h2>JWT Authorization</h2>
+						<p> with Next.js & JWT!!</p>
+					</header>
+
+					<div className="home-content">
+						<Link href={'/users'}>
+							<a className="link private-link">Manage Users</a>
+						</Link>
+						<div className="home-links">
+							<Link href={'/login'}>
+								<a className="link public-link">Login</a>
+							</Link>
+							|
+							<Link href={'/register'}>
+								<a className="link public-link">Register</a>
+							</Link>
+						</div>
+					</div>
+				</>
+			)}
 		</>
 	);
 }

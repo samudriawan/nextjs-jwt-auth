@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import LoginForm from '../components/form/Login';
 
 function Login() {
@@ -19,6 +20,17 @@ function Login() {
 				</p>
 			</header>
 			<LoginForm />
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+				}}
+			>
+				<Link href={'/register'}>
+					<a className="public-link">Create an account</a>
+				</Link>
+			</div>
 		</>
 	);
 }
