@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import UserView from '../../components/UserView';
 import { useAuthContext } from '../../context/authContext';
@@ -24,7 +25,22 @@ function UsersPage() {
 					Go Back
 				</button>
 
-				{!auth ? <p>No data to display</p> : <UserView />}
+				{!auth ? (
+					<div className="home-links">
+						<p>
+							<Link href={'/login'}>
+								<a className="link public-link">Login</a>
+							</Link>{' '}
+							or{' '}
+							<Link href={'/register'}>
+								<a className="link public-link">Register</a>
+							</Link>{' '}
+							to view the data.
+						</p>
+					</div>
+				) : (
+					<UserView />
+				)}
 			</div>
 		</>
 	);
