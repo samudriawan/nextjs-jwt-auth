@@ -1,12 +1,11 @@
 import jwt from 'jsonwebtoken';
-import connectDB from '../dbConn';
 
 export function apiHandler(handler) {
 	return async (req, res) => {
 		const method = req.method.toLowerCase();
 
 		// check handler supports HTTP method
-		if (!handler[method]) return res.status(405);
+		if (!handler[method]) return res.status(405).end();
 
 		const publicPaths = [
 			'/api/auth/authenticate',
@@ -34,14 +33,12 @@ export function apiHandler(handler) {
 				req.email = decoded.email;
 			}
 
-			// connect to mongoDB
-			connectDB();
-
 			// route handler
 			await handler[method](req, res);
 		} catch (err) {
-			if (err.message === 'jwt expired')
+			if (err.message === 'jwt expired') {
 				return res.status(403).send(err.message);
+			}
 
 			// default to 500 server error
 			return res.status(500).json(err);

@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import cookie from 'cookie';
 import { apiHandler } from '../../../helpers/api/api-handler';
-import User from '../../../model/User';
+import prisma from '../../../lib/prisma';
 
 export default apiHandler({
 	post: refresh,
@@ -11,29 +11,31 @@ async function refresh(req, res) {
 	const { method, cookies } = req;
 
 	if (method === 'POST') {
-		const refreshToken = cookies.jwt;
-		if (!refreshToken) return res.status(401).send('token not found');
+		const refreshTokenCookies = cookies.jwt;
+		if (!refreshTokenCookies) return res.status(401).send('token not found');
 
-		const foundUser = await User.findOne({
-			refresh_token: refreshToken,
-		}).exec();
+		const foundUser = await prisma.user.findFirst({
+			where: {
+				refreshToken: refreshTokenCookies,
+			},
+		});
 
 		// user with refresh token from cookies is not found in db,
 		// which means refresh token is an old token and reused
 		if (!foundUser) {
 			jwt.verify(
-				refreshToken,
+				refreshTokenCookies,
 				process.env.NEXT_PUBLIC_REFRESH_TOKEN_KEY,
 				async (err, decoded) => {
 					if (err) return res.status(403).end();
 
 					// find user associate with the token
 					// and delete all stored refresh token in db from that user
-					const hackedUser = await User.findOne({
-						email: decoded.email,
-					}).exec();
-					hackedUser.refresh_token = [];
-					await hackedUser.save();
+					const hackedUser = await prisma.user.update({
+						where: { email: decoded.email },
+						data: { refreshToken: '' },
+					});
+					// console.log('hacked User: ', hackedUser);
 				}
 			);
 
@@ -41,19 +43,25 @@ async function refresh(req, res) {
 		}
 
 		// delete refresh token in db which match the refresh token from cookies
-		const newRefreshTokenArray = foundUser.refresh_token.filter(
-			(rt) => rt !== refreshToken
+		foundUser.refreshToken = foundUser.refreshToken.replace(
+			refreshTokenCookies,
+			''
 		);
 
 		// evaluate refresh token
 		jwt.verify(
-			refreshToken,
+			refreshTokenCookies,
 			process.env.NEXT_PUBLIC_REFRESH_TOKEN_KEY,
 			async (err, decoded) => {
 				if (err) {
 					// refresh token expired
-					foundUser.refresh_token = [...newRefreshTokenArray];
-					await foundUser.save();
+					const removeToken = await prisma.user.update({
+						where: { email: foundUser.email },
+						data: {
+							refreshToken: '',
+						},
+					});
+					// console.log('removed: ', removeToken);
 					return res.status(403).end();
 				}
 
@@ -75,8 +83,12 @@ async function refresh(req, res) {
 				);
 
 				// saving new refresh token to current user
-				foundUser.refresh_token = [...newRefreshTokenArray, newRefreshToken];
-				await foundUser.save();
+				foundUser.refreshToken = newRefreshToken;
+				const updated = await prisma.user.update({
+					where: { email: decoded.email },
+					data: foundUser,
+				});
+				// console.log('saved: ', updated);
 
 				res.setHeader(
 					'Set-Cookie',

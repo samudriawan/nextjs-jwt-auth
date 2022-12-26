@@ -2,7 +2,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import cookie from 'cookie';
-import User from '../../../model/User';
+import prisma from '../../../lib/prisma';
 import { apiHandler } from '../../../helpers/api/api-handler';
 
 export default apiHandler({
@@ -33,11 +33,16 @@ async function register(req, res) {
 			.json({ success: false, msg: 'Password and/or Email is not valid.' });
 
 	// get user data
-	const foundUser = await User.findOne({ email: emailSanitize }).exec();
+	const foundUser = await prisma.user.findUnique({
+		where: { email: emailSanitize },
+	});
 
 	// found user with same email
 	if (foundUser)
 		return res.status(400).json({ success: false, msg: 'Email already exist' });
+
+	// create password from client to hash data
+	const hash = bcrypt.hashSync(password, 11);
 
 	// create JWTs
 	const accessToken = jwt.sign(
@@ -51,12 +56,14 @@ async function register(req, res) {
 		{ expiresIn: '7d' }
 	);
 
-	// create new user to DB
-	await User.create({
+	const newUser = {
 		email: emailSanitize,
-		hash: await bcrypt.hash(password, 11), // create password from client to hash data
-		refresh_token: [refreshToken],
-	});
+		hash,
+		refreshToken,
+	};
+
+	// create new user to DB
+	const result = await prisma.user.create({ data: newUser });
 
 	// create httpOnly secure cookies with refresh token
 	res.setHeader(

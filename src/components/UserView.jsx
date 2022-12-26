@@ -96,7 +96,7 @@ function UserView() {
 							<tbody>
 								<tr>
 									<th>ID</th>
-									<td>{user?._id}</td>
+									<td>{user?.id}</td>
 								</tr>
 								<tr>
 									<th>Email</th>

@@ -1,5 +1,5 @@
 import { apiHandler } from '../../../helpers/api/api-handler';
-import User from '../../../model/User';
+import prisma from '../../../lib/prisma';
 import cookie from 'cookie';
 
 export default apiHandler({
@@ -9,26 +9,30 @@ export default apiHandler({
 async function logout(req, res) {
 	const { method, cookies } = req;
 
-	if (method !== 'POST') return res.status(500);
+	if (method !== 'POST') return res.status(500).json('method error');
 
-	if (!cookies) return res.status(204); // No content
+	if (!cookies.jwt) return res.status(204).end(); // No content
 
-	const refreshToken = cookies.jwt;
+	const refreshTokenCookies = cookies.jwt;
 
 	// is refresh token in DB?
-	const foundUser = await User.findOne({ refresh_token: refreshToken }).exec();
+	const foundUser = await prisma.user.findFirst({
+		where: { refreshToken: refreshTokenCookies },
+	});
+
 	// delete refresh token in DB
 	if (foundUser) {
-		foundUser.refresh_token = foundUser.refresh_token.filter(
-			(rt) => rt !== refreshToken
-		);
-		await foundUser.save();
+		const result = await prisma.user.update({
+			where: { email: foundUser.email },
+			data: { refreshToken: '' },
+		});
+		// console.log(result);
 	}
 
 	// delete cookies
 	res.setHeader(
 		'Set-Cookie',
-		cookie.serialize('jwt', 'deleted', {
+		cookie.serialize('jwt', '', {
 			httpOnly: true, // accessible only by web server
 			secure: true, // https
 			sameSite: 'none', // cross-site cookie

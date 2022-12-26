@@ -2,7 +2,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import cookie from 'cookie';
-import User from '../../../model/User';
+import prisma from '../../../lib/prisma';
 import { apiHandler } from '../../../helpers/api/api-handler';
 
 export default apiHandler({
@@ -11,14 +11,14 @@ export default apiHandler({
 
 async function login(req, res) {
 	const { email, password } = req.body;
-	const { method, cookies } = req;
+	const { method } = req;
 
 	// only accept POST method
 	if (method !== 'POST')
 		return res.status(500).json('Method is not supported.');
 
 	// get user data
-	const foundUser = await User.findOne({ email: email }).exec();
+	const foundUser = await prisma.user.findUnique({ where: { email } });
 
 	// user not found
 	if (!foundUser)
@@ -44,14 +44,11 @@ async function login(req, res) {
 		{ expiresIn: '7d' }
 	);
 
-	// get refresh token from DB
-	let refreshTokenArray = cookies['jwt']
-		? foundUser.refresh_token.filter((rt) => rt !== cookies['jwt'])
-		: foundUser.refresh_token;
-
 	// add newly created refresh token to DB
-	foundUser.refresh_token = [...refreshTokenArray, refreshToken];
-	await foundUser.save();
+	const result = await prisma.user.update({
+		where: { email: foundUser.email },
+		data: { refreshToken },
+	});
 
 	// create httpOnly secure cookies with refresh token
 	res.setHeader(
