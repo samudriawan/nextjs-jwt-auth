@@ -8,7 +8,7 @@ User Login and Authorization system with [JSON Web Token (JWT)](https://www.npmj
 - **Refresh Token** - after access token expires, refresh token is use to create new access token and new refresh token.
 - **Refresh Token Reuse Detection** - follow the flow from [auth0](https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/#Refresh-Token-Automatic-Reuse-Detection).
 
-I'm storing users data in a JSON file located at `/data/db.json`, using [MongoDB](https://www.mongodb.org/) with [mongoose](https://www.npmjs.com/package/mongoose) at `mongoose` branch.
+I'm storing users data in a JSON file located at `/data/db.json`, using [MongoDB](https://www.mongodb.org/) with [mongoose](https://www.npmjs.com/package/mongoose) at `mongoose` branch and MySQL with [prisma](https://www.npmjs.com/package/prisma) at `prisma` branch.
 
 Some code follow from [Refresh Token Rotation](https://github.com/gitdagray/refresh_token_rotation).
 
